@@ -1,3 +1,4 @@
+//Represents a single note with an id, title and text.
 class Note {
   constructor(id, title, text) {
     this.id = id;
@@ -5,11 +6,9 @@ class Note {
     this.text = text;
   }
 }
-
+//Loads saved notes from localStorage
 class App {
   constructor() {
-    // localStorage.setItem('test', JSON.stringify(['123']));
-    // console.log(JSON.parse(localStorage.getItem('test')));
     this.notes = JSON.parse(localStorage.getItem("notes")) || [];
     this.selectedNoteId = "";
     this.miniSidebar = true;
@@ -32,6 +31,7 @@ class App {
     this.displayNotes();
   }
 
+  //Register all application event listeners.
   addEventListeners() {
     document.body.addEventListener("click", (event) => {
       this.handleFormClick(event);
@@ -60,7 +60,7 @@ class App {
       this.handleToggleSidebar();
     });
   }
-
+  //Opens the expanded note form or saves the note when the user clicks outside the form.
   handleFormClick(event) {
     const isActiveFormClickedOn = this.$activeForm.contains(event.target);
     const isInactiveFormClickedOn = this.$inactiveForm.contains(event.target);
@@ -75,12 +75,14 @@ class App {
     }
   }
 
+  //Display the expanded note form.
   openActiveForm() {
     this.$inactiveForm.style.display = "none";
     this.$activeForm.style.display = "block";
     this.$noteText.focus();
   }
 
+  //Reset the form and switch back to the collapsed state
   closeActiveForm() {
     this.$inactiveForm.style.display = "block";
     this.$activeForm.style.display = "none";
@@ -88,6 +90,7 @@ class App {
     this.$noteTitle.value = "";
   }
 
+  //Opens the edit modal when a note is clicked.
   openModal(event) {
     const $selectedNote = event.target.closest(".note");
     if ($selectedNote && !event.target.closest(".archive")) {
@@ -100,6 +103,7 @@ class App {
     }
   }
 
+  //Saves any edits and closes the modal
   closeModal(event) {
     const isModalFormClickedOn = this.$modalForm.contains(event.target);
     const isCloseModalBtnClickedOn = this.$closeModalForm.contains(
@@ -116,23 +120,26 @@ class App {
       this.$modal.classList.remove("open-modal");
     }
   }
-handleArchiving(event) {
-  if (!event.target.closest(".archive")) return;
 
-  // Archive clicked inside the modal
-  if (this.$modal.contains(event.target)) {
-    this.deleteNote(this.selectedNoteId);
-    this.$modal.classList.remove("open-modal");
-    return;
+  //Deletes a note from either the note card or the archive button inside the modal.
+  handleArchiving(event) {
+    if (!event.target.closest(".archive")) return;
+
+    // Archive clicked inside the modal
+    if (this.$modal.contains(event.target)) {
+      this.deleteNote(this.selectedNoteId);
+      this.$modal.classList.remove("open-modal");
+      return;
+    }
+
+    // Archive clicked on a note card
+    const note = event.target.closest(".note");
+    if (note) {
+      this.deleteNote(note.id);
+    }
   }
 
-  // Archive clicked on a note card
-  const note = event.target.closest(".note");
-  if (note) {
-    this.deleteNote(note.id);
-  }
-}
-
+  //Creates a new note and adds it to the notes array.
   addNote({ title, text }) {
     if (text != "") {
       const newNote = new Note(cuid(), title, text);
@@ -141,6 +148,7 @@ handleArchiving(event) {
     }
   }
 
+  //Updates an existing note.
   editNote(id, { title, text }) {
     this.notes = this.notes.map((note) => {
       if (note.id == id) {
@@ -167,7 +175,7 @@ handleArchiving(event) {
     $checkNote.style.visibility = "hidden";
     $noteFooter.style.visibility = "hidden";
   }
-
+  //Expands and collapses the sidebar.
   handleToggleSidebar() {
     if (this.miniSidebar) {
       this.$sidebar.style.width = "250px";
@@ -181,16 +189,18 @@ handleArchiving(event) {
       this.miniSidebar = true;
     }
   }
-
+  //Saves notes in localStorage.
   saveNotes() {
     localStorage.setItem("notes", JSON.stringify(this.notes));
   }
 
+  //Save changes and refresh the UI.
   render() {
     this.saveNotes();
     this.displayNotes();
   }
 
+  //Generate the HTML for every note and display it.
   displayNotes() {
     this.$notes.innerHTML = this.notes
       .map(
@@ -246,10 +256,12 @@ handleArchiving(event) {
       .join("");
   }
 
+  //Removes a note from the collection.
   deleteNote(id) {
     this.notes = this.notes.filter((note) => note.id != id);
     this.render();
   }
 }
 
+//Start the application.
 const app = new App();

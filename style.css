@@ -49,6 +49,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   height: 64px;
+
   border-bottom: 1px solid #dadce0;
   padding: 8px;
   margin: 0 10px;
@@ -96,7 +97,10 @@ input:focus {
 .search-area span {
   margin-left: 10px;
 }
-
+.profile-actions-area{
+display: flex;
+flex-direction: row;
+}
 /* MAIN SECTION STYLES */
 
 /* SIDEBAR  */
